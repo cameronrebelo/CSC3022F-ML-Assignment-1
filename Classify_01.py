@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda, Compose
 import matplotlib.pyplot as plt
+from PIL import Image
 
 # Download training data from open datasets.
 training_data = datasets.MNIST(
@@ -68,15 +69,29 @@ print("Using {} device".format(device))
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
+        input_size = 784
+        hidden_sizes = [128, 64]
+        output_size = 10
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28*28, 512),
-            nn.ReLU(),
-            nn.Linear(512, 512),
-            nn.ReLU(),
-            nn.Linear(512, 10),
-            nn.ReLU()
-        )
+
+        # Model from tutorial
+
+        #     nn.Linear(28*28, 512),
+        #     nn.ReLU(),
+        #     nn.Linear(512, 512),
+        #     nn.ReLU(),
+        #     nn.Linear(512, 10)
+        # )
+
+        #Model from https://towardsdatascience.com/handwritten-digit-mnist-pytorch-977b5338e627 
+
+        nn.Linear(input_size, hidden_sizes[0]),
+        nn.ReLU(),
+        nn.Linear(hidden_sizes[0], hidden_sizes[1]),
+        nn.ReLU(),
+        nn.Linear(hidden_sizes[1], output_size),
+        nn.LogSoftmax(dim=1))
 
     def forward(self, x):
         x = self.flatten(x)
@@ -87,11 +102,34 @@ model = NeuralNetwork().to(device)
 print(model)
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
-epochs = 5
+epochs = 1
 for t in range(epochs):
-    print(f"Epoch {t+1}\n-------------------------------")
+    print("\033[96m {}{}{}\033[00m" .format("Epoch ",t+1,"\n-------------------------------"))
     train(train_dataloader, model, loss_fn, optimizer)
     test(test_dataloader, model)
-print("Done!")
+print("Done Training")
+
+
+#----------------------------------------------------------------
+#User input section
+#----------------------------------------------------------------
+trans = Compose([ToTensor(),])
+
+
+classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+user_input = input()
+while((user_input.lower())!= "exit"):
+    image = Image.open(user_input)
+    formatted_input = trans(image)
+    with torch.no_grad():
+        pred = model(formatted_input)
+        predicted = classes[pred[0].argmax(0)]
+        
+        print(f'Classifier: "{predicted}"')
+    user_input = input()
+
+    
+print("Exiting....")
