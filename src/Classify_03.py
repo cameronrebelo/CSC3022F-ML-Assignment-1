@@ -151,7 +151,7 @@ if(user_test):
             predicted = classes[pred[0].argmax(0)]
 
             print(f'Classifier: "{predicted}"')
-        user_input = input("Please enter a filepath:")
+        user_input = input("Please enter a filepath:\n")
 
         
     print("Exiting....")

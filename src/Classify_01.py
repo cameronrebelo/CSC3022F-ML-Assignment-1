@@ -9,6 +9,7 @@ from PIL import Image
 import time
 import sys
 
+# Test for best Activation Function
 
 #Hyperparamaters
 lr = 0.4
@@ -16,7 +17,7 @@ epochs = 10
 user_test = False
 mode = 1
 #Loss function = Cross Entropy
-#Model = Relu
+#Model = TanH, Sigmoid, ReLU or LeakyReLU
 #Optimizer = SGD
 
 #Handle Command Line arguements
@@ -31,6 +32,18 @@ if(len(sys.argv)>1):
 
 # Start a counter for timing
 time_begin = time.time()
+
+# Crete array for graph data
+accuracy = []
+epoch_no = []
+if(mode==1):
+    file = "plot_Tanh.png"
+if(mode==2):
+    file = "plot_Sigmoid.png"
+if(mode==3):
+    file = "plot_ReLU.png"
+if(mode==4):
+    file = "plot_LeakyReLU.png"
 
 # Access training data from data folder
 training_data = datasets.MNIST(
@@ -78,6 +91,7 @@ def test(dataloader, model):
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
     test_loss /= size
     correct /= size
+    accuracy.append((100*correct))
     temp = (f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     
     print("\033[91m {}\033[00m" .format(temp))
@@ -100,31 +114,26 @@ class NeuralNetwork(nn.Module):
         hidden_sizes = [128, 64]
         output_size = 10
         self.flatten = nn.Flatten()
-
         if(mode==1):
             self.linear_relu_stack = nn.Sequential(
             nn.Linear(input_size, hidden_sizes[0]),
             nn.Tanh(),
-            nn.Linear(hidden_sizes[0], output_size),
             nn.LogSoftmax(dim=1))
         if(mode==2):
             self.linear_relu_stack = nn.Sequential(
             nn.Linear(input_size, hidden_sizes[0]),
             nn.Sigmoid(),
-            nn.Linear(hidden_sizes[0], output_size),
             nn.LogSoftmax(dim=1))
         if(mode==3):
             self.linear_relu_stack = nn.Sequential(
             nn.Linear(input_size, hidden_sizes[0]),
             nn.ReLU(),
-            nn.Linear(hidden_sizes[0], output_size),
             nn.LogSoftmax(dim=1))
         if(mode==4):
             self.linear_relu_stack = nn.Sequential(
             nn.Linear(input_size, hidden_sizes[0]),
             nn.LeakyReLU(),
-            nn.Linear(hidden_sizes[0], output_size),
-            nn.LogSoftmax(dim=1))    
+            nn.LogSoftmax(dim=1))
 
         
 
@@ -144,13 +153,15 @@ for t in range(epochs):
     print("\033[96m {}{}{}\033[00m" .format("Epoch ",t+1,"\n-------------------------------"))
     train(train_dataloader, model, loss_fn, optimizer)
     test(test_dataloader, model)
+    epoch_no.append(t+1)
 total_time = '{:.0f}'.format(time.time() - time_begin)
 print("\033[92m {}{}{}{}\033[00m" .format("Done Training\n","Time Taken: ",total_time," seconds"))
 
 #Graphing
-plt.title('Validation accuracy. Dot denotes best accuracy.')
-plt.plot(Accuracy, label='Validation accuracy')
-plt.plot(best_epoch, best_acc, 'bo', label='Best accuracy')
+
+plt.title('Accuracy')
+plt.plot(accuracy, label='Accuracy')
+plt.savefig('outputs/Classify_01/'+file)
 plt.show()
 
 #----------------------------------------------------------------
@@ -175,7 +186,7 @@ if(user_test):
             predicted = classes[pred[0].argmax(0)]
 
             print(f'Classifier: "{predicted}"')
-        user_input = input("Please enter a filepath:")
+        user_input = input("Please enter a filepath:\n")
 
         
     print("Exiting....")

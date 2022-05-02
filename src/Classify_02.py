@@ -9,7 +9,7 @@ from PIL import Image
 import time
 import sys
 
-#Testing loss functions
+#Optimizers
 
 #Hyperparamaters
 lr = 0.4
@@ -18,7 +18,7 @@ user_test = False
 mode = 1
 #Loss function = Cross Entropy
 #Model = Relu
-#Optimizer = SGD
+#Optimizer = SGD OR ADAM
 
 #Handle Command Line arguements
 if(len(sys.argv)>1):
@@ -26,12 +26,22 @@ if(len(sys.argv)>1):
     if(len(sys.argv)>2):   
         # mode = int(sys.argv[2])
         # if(len(sys.argv)>3):
-        if(sys.argv[3].lower()=="test"):
+        if(sys.argv[2].lower()=="test"):
             user_test = True
 
 
 # Start a counter for timing
 time_begin = time.time()
+
+
+# Crete array for graph data
+accuracy = []
+epoch_no = []
+if(mode==1):
+    file = "plot_SGD.png"
+if(mode==2):
+    file = "plot_ADAM.png"
+
 
 # Access training data from data folder
 training_data = datasets.MNIST(
@@ -89,7 +99,7 @@ batch_size = 64
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
-# Get cpu or gpu device for training.
+# Get device for training
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Using {} device".format(device))
 
@@ -106,7 +116,6 @@ class NeuralNetwork(nn.Module):
         self.linear_relu_stack = nn.Sequential(
         nn.Linear(input_size, hidden_sizes[0]),
         nn.LeakyReLU(),
-        nn.Linear(hidden_sizes[0], output_size),
         nn.LogSoftmax(dim=1))    
 
 
@@ -120,8 +129,13 @@ print(model)
 
 
 
-loss_fn = nn.NLLLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr)
+loss_fn = nn.CrossEntropyLoss()
+if(mode==1):
+    optimizer = torch.optim.SGD(model.parameters(), lr)
+if(mode==2):
+    optimizer = torch.optim.Adam(model.parameters(), lr)
+
+
 
 
 for t in range(epochs):
@@ -130,6 +144,13 @@ for t in range(epochs):
     test(test_dataloader, model)
 total_time = '{:.0f}'.format(time.time() - time_begin)
 print("\033[92m {}{}{}{}\033[00m" .format("Done Training\n","Time Taken: ",total_time," seconds"))
+
+#Graphing
+
+plt.title('Accuracy')
+plt.plot(accuracy, label='Accuracy')
+plt.savefig('outputs/Classify_01/'+file)
+plt.show()
 
 
 #----------------------------------------------------------------
