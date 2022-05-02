@@ -1,3 +1,4 @@
+print("USAGE:\npython3 ...Classify_01 {number of epochs} {mode} {user input = test}")
 # Courtesy of https://pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html
 import torch
 from torch import nn
@@ -10,6 +11,7 @@ import time
 import sys
 
 # Test for best Activation Function
+
 
 #Hyperparamaters
 lr = 0.4

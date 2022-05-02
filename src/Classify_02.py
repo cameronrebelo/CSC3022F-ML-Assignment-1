@@ -1,3 +1,4 @@
+print("USAGE:\npython3 ...Classify_02 {mode} {user input = test}\n\n")
 # Courtesy of https://pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html
 import torch
 from torch import nn
@@ -11,6 +12,7 @@ import sys
 
 #Optimizers
 
+
 #Hyperparamaters
 lr = 0.4
 epochs = 10
@@ -23,9 +25,7 @@ mode = 1
 #Handle Command Line arguements
 if(len(sys.argv)>1):
     mode = int(sys.argv[1])
-    if(len(sys.argv)>2):   
-        # mode = int(sys.argv[2])
-        # if(len(sys.argv)>3):
+    if(len(sys.argv)>2):
         if(sys.argv[2].lower()=="test"):
             user_test = True
 
@@ -89,6 +89,7 @@ def test(dataloader, model):
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
     test_loss /= size
     correct /= size
+    accuracy.append((100*correct))
     temp = (f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     
     print("\033[91m {}\033[00m" .format(temp))
@@ -142,6 +143,7 @@ for t in range(epochs):
     print("\033[96m {}{}{}\033[00m" .format("Epoch ",t+1,"\n-------------------------------"))
     train(train_dataloader, model, loss_fn, optimizer)
     test(test_dataloader, model)
+    epoch_no.append(t+1)
 total_time = '{:.0f}'.format(time.time() - time_begin)
 print("\033[92m {}{}{}{}\033[00m" .format("Done Training\n","Time Taken: ",total_time," seconds"))
 
@@ -149,7 +151,7 @@ print("\033[92m {}{}{}{}\033[00m" .format("Done Training\n","Time Taken: ",total
 
 plt.title('Accuracy')
 plt.plot(accuracy, label='Accuracy')
-plt.savefig('outputs/Classify_01/'+file)
+plt.savefig('outputs/Classify_02/'+file)
 plt.show()
 
 

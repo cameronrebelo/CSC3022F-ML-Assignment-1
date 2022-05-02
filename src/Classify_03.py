@@ -1,3 +1,4 @@
+print("USAGE:\npython3 ...Classify_03 {number of epochs} {user input = test}")
 # Courtesy of https://pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html
 import torch
 from torch import nn
@@ -10,7 +11,6 @@ import time
 import sys
 
 #this version tests for best number of epochs
-
 
 #Hyperparamaters
 lr = 0.4
@@ -31,6 +31,11 @@ if(len(sys.argv)>1):
 
 # Start a counter for timing
 time_begin = time.time()
+
+# Crete array for graph data
+accuracy = []
+epoch_no = []
+file = "plot_"+str(epochs)
 
 # Access training data from data folder
 training_data = datasets.MNIST(
@@ -78,6 +83,7 @@ def test(dataloader, model):
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
     test_loss /= size
     correct /= size
+    accuracy.append((100*correct))
     temp = (f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     
     print("\033[91m {}\033[00m" .format(temp))
@@ -100,13 +106,9 @@ class NeuralNetwork(nn.Module):
         hidden_sizes = [128, 64]
         output_size = 10
         self.flatten = nn.Flatten()
-        #Model from https://towardsdatascience.com/handwritten-digit-mnist-pytorch-977b5338e627 
         self.linear_relu_stack = nn.Sequential(
         nn.Linear(input_size, hidden_sizes[0]),
         nn.ReLU(),
-        nn.Linear(hidden_sizes[0], hidden_sizes[1]),
-        nn.ReLU(),
-        nn.Linear(hidden_sizes[1], output_size),
         nn.LogSoftmax(dim=1))
 
     def forward(self, x):
@@ -125,9 +127,15 @@ for t in range(epochs):
     print("\033[96m {}{}{}\033[00m" .format("Epoch ",t+1,"\n-------------------------------"))
     train(train_dataloader, model, loss_fn, optimizer)
     test(test_dataloader, model)
+    epoch_no.append(t+1)
 total_time = '{:.0f}'.format(time.time() - time_begin)
 print("\033[92m {}{}{}{}\033[00m" .format("Done Training\n","Time Taken: ",total_time," seconds"))
 
+
+plt.title('Accuracy')
+plt.plot(accuracy, label='Accuracy')
+plt.savefig('outputs/Classify_03/'+file)
+plt.show()
 
 #----------------------------------------------------------------
 #User input section
