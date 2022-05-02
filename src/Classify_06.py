@@ -9,24 +9,23 @@ from PIL import Image
 import time
 import sys
 
-#Testing loss functions
+
+#This version tests for best learning rate
 
 #Hyperparamaters
 lr = 0.4
-epochs = 10
+epochs = 20
 user_test = False
-mode = 1
+
 #Loss function = Cross Entropy
 #Model = Relu
 #Optimizer = SGD
 
-#Handle Command Line arguements
+# Handle Command Line arguements
 if(len(sys.argv)>1):
-    mode = int(sys.argv[1])
-    if(len(sys.argv)>2):   
-        # mode = int(sys.argv[2])
-        # if(len(sys.argv)>3):
-        if(sys.argv[3].lower()=="test"):
+    lr = float(sys.argv[1])
+    if(len(sys.argv)>2):
+        if(sys.argv[2].lower()=="test"):
             user_test = True
 
 
@@ -101,14 +100,14 @@ class NeuralNetwork(nn.Module):
         hidden_sizes = [128, 64]
         output_size = 10
         self.flatten = nn.Flatten()
-
-        #LeakyReLU was found to be the best
+        #Model from https://towardsdatascience.com/handwritten-digit-mnist-pytorch-977b5338e627 
         self.linear_relu_stack = nn.Sequential(
         nn.Linear(input_size, hidden_sizes[0]),
-        nn.LeakyReLU(),
-        nn.Linear(hidden_sizes[0], output_size),
-        nn.LogSoftmax(dim=1))    
-
+        nn.ReLU(),
+        nn.Linear(hidden_sizes[0], hidden_sizes[1]),
+        nn.ReLU(),
+        nn.Linear(hidden_sizes[1], output_size),
+        nn.LogSoftmax(dim=1))
 
     def forward(self, x):
         x = self.flatten(x)
@@ -118,9 +117,7 @@ class NeuralNetwork(nn.Module):
 model = NeuralNetwork().to(device)
 print(model)
 
-
-
-loss_fn = nn.NLLLoss()
+loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr)
 
 

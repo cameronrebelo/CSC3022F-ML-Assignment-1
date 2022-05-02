@@ -9,7 +9,6 @@ from PIL import Image
 import time
 import sys
 
-#Testing loss functions
 
 #Hyperparamaters
 lr = 0.4
@@ -22,12 +21,12 @@ mode = 1
 
 #Handle Command Line arguements
 if(len(sys.argv)>1):
-    mode = int(sys.argv[1])
+    epochs = int(sys.argv[1])
     if(len(sys.argv)>2):   
-        # mode = int(sys.argv[2])
-        # if(len(sys.argv)>3):
-        if(sys.argv[3].lower()=="test"):
-            user_test = True
+        mode = int(sys.argv[2])
+        if(len(sys.argv)>3):
+            if(sys.argv[3].lower()=="test"):
+                    user_test = True
 
 
 # Start a counter for timing
@@ -102,13 +101,32 @@ class NeuralNetwork(nn.Module):
         output_size = 10
         self.flatten = nn.Flatten()
 
-        #LeakyReLU was found to be the best
-        self.linear_relu_stack = nn.Sequential(
-        nn.Linear(input_size, hidden_sizes[0]),
-        nn.LeakyReLU(),
-        nn.Linear(hidden_sizes[0], output_size),
-        nn.LogSoftmax(dim=1))    
+        if(mode==1):
+            self.linear_relu_stack = nn.Sequential(
+            nn.Linear(input_size, hidden_sizes[0]),
+            nn.Tanh(),
+            nn.Linear(hidden_sizes[0], output_size),
+            nn.LogSoftmax(dim=1))
+        if(mode==2):
+            self.linear_relu_stack = nn.Sequential(
+            nn.Linear(input_size, hidden_sizes[0]),
+            nn.Sigmoid(),
+            nn.Linear(hidden_sizes[0], output_size),
+            nn.LogSoftmax(dim=1))
+        if(mode==3):
+            self.linear_relu_stack = nn.Sequential(
+            nn.Linear(input_size, hidden_sizes[0]),
+            nn.ReLU(),
+            nn.Linear(hidden_sizes[0], output_size),
+            nn.LogSoftmax(dim=1))
+        if(mode==4):
+            self.linear_relu_stack = nn.Sequential(
+            nn.Linear(input_size, hidden_sizes[0]),
+            nn.LeakyReLU(),
+            nn.Linear(hidden_sizes[0], output_size),
+            nn.LogSoftmax(dim=1))    
 
+        
 
     def forward(self, x):
         x = self.flatten(x)
@@ -118,9 +136,7 @@ class NeuralNetwork(nn.Module):
 model = NeuralNetwork().to(device)
 print(model)
 
-
-
-loss_fn = nn.NLLLoss()
+loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr)
 
 
@@ -131,6 +147,11 @@ for t in range(epochs):
 total_time = '{:.0f}'.format(time.time() - time_begin)
 print("\033[92m {}{}{}{}\033[00m" .format("Done Training\n","Time Taken: ",total_time," seconds"))
 
+#Graphing
+plt.title('Validation accuracy. Dot denotes best accuracy.')
+plt.plot(Accuracy, label='Validation accuracy')
+plt.plot(best_epoch, best_acc, 'bo', label='Best accuracy')
+plt.show()
 
 #----------------------------------------------------------------
 #User input section
