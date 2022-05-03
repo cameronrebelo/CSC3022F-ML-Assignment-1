@@ -1,5 +1,7 @@
 RBLCAM001 - ML ASSIGNMENT 1
 
+Please make sure MNIST dataset is in directory called data/
+
 Each differant classifier has a different set of CLI that can be used to control 
 certain paramters of the program. They all have default values should you not wish to enter any.
 In order to get the classifiers into user input mode, please match the specified number of CLI
