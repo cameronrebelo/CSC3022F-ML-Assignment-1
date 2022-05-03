@@ -1,0 +1,29 @@
+RBLCAM001 - ML ASSIGNMENT 1
+
+Each differant classifier has a different set of CLI that can be used to control 
+certain paramters of the program. They all have default values should you not wish to enter any.
+In order to get the classifiers into user input mode, please match the specified number of CLI
+and finish it with the word "test". 
+Should you need further clarification each program will display a USAGE format when run.
+
+
+src/Classify_01:
+    This is the first Model that given a number of epochs to test over and a mode number, will
+    change the activation function to a differant one. 
+    mode 1: tanh
+    mode 2: sigmoid
+    mode 3: ReLU
+    mode 4: Leaky ReLU
+
+src/Classify_02:
+    This model test the Adam and SGD optimizers. No number of epochs is required here.
+    mode 1: SGD
+    mode 2: Adam
+
+src/Classify_03:
+    This model tests a variety of epochs and their accuracy given an epoch number in CLI.
+
+src/Classify_04:
+    This model test learning rate. No epoch number is required here.
+
+The bash scripts in test_scripts/ where used to generate the data in outputs

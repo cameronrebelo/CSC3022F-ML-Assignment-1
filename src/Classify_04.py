@@ -36,7 +36,8 @@ time_begin = time.time()
 # Crete array for graph data
 accuracy = []
 epoch_no = []
-file = "plot_"+str(lr)
+temp = str(lr).replace(".",",")
+file = "plot_"+temp
 
 # Access training data from data folder
 training_data = datasets.MNIST(
